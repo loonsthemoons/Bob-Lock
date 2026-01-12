@@ -27,12 +27,13 @@ public abstract class MixinItemInHandRenderer {
     @Unique
     private float customBobOffset = 0.0f;
 
+    @Unique
+    private long lastInputTime = 0;
+
     @Inject(method = "renderArmWithItem", at = @At("HEAD"))
     private void onRenderItemHead(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand,
             float swingProgress, ItemStack stack, float equipProgress, PoseStack poseStack, MultiBufferSource buffer,
             int combinedLight, CallbackInfo ci) {
-        // Check the option BEFORE setting the flag, so we get the real value (not our
-        // forced-false value)
         boolean bobEnabled = this.minecraft.options.bobView().get();
 
         BobLockClient.isRenderingHand = true;
@@ -40,14 +41,21 @@ public abstract class MixinItemInHandRenderer {
         // Custom Bobbing Application
         if (bobEnabled) {
             // Check input keys instead of velocity for immediate response
-            boolean isMoving = this.minecraft.options.keyUp.isDown() ||
+            boolean isInputActive = this.minecraft.options.keyUp.isDown() ||
                     this.minecraft.options.keyDown.isDown() ||
                     this.minecraft.options.keyLeft.isDown() ||
                     this.minecraft.options.keyRight.isDown();
 
-            // Reduced target offset to -0.05f (was -0.1f)
-            float targetOffset = isMoving ? -0.05f : 0.0f;
-            // Lower lerp factor for smoother/slower transition (was 0.1f)
+            if (isInputActive) {
+                this.lastInputTime = System.currentTimeMillis();
+            }
+
+            // Add a small delay (150ms) before returning to verify "stop moving"
+            long timeSinceInput = System.currentTimeMillis() - this.lastInputTime;
+            boolean shouldBeLowered = isInputActive || timeSinceInput < 150;
+
+            float targetOffset = shouldBeLowered ? -0.075f : 0.0f;
+            // Lower lerp factor for smoother/slower transition
             float lerpFactor = 0.05f;
 
             this.customBobOffset = Mth.lerp(lerpFactor, this.customBobOffset, targetOffset);

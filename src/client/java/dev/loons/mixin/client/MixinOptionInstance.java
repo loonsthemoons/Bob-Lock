@@ -21,8 +21,7 @@ public class MixinOptionInstance<T> {
                     cir.setReturnValue((T) Boolean.FALSE);
                 }
             } catch (Exception e) {
-                // Ignore errors (e.g. if Minecraft not initialized yet, though unlikely during
-                // render)
+
             }
         }
     }
