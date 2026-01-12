@@ -2,8 +2,9 @@
 	"required": true,
 	"package": "dev.loons.mixin.client",
 	"compatibilityLevel": "JAVA_21",
-	"client": [
-		"ExampleClientMixin"
+	"mixins": [
+		"MixinGameRenderer",
+		"MixinItemInHandRenderer"
 	],
 	"injectors": {
 		"defaultRequire": 1
