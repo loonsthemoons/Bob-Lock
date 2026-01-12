@@ -50,13 +50,13 @@ public abstract class MixinItemInHandRenderer {
                 this.lastInputTime = System.currentTimeMillis();
             }
 
-            // Add a small delay (150ms) before returning to verify "stop moving"
+            // Add a small delay before returning to verify stop moving
             long timeSinceInput = System.currentTimeMillis() - this.lastInputTime;
-            boolean shouldBeLowered = isInputActive || timeSinceInput < 150;
+            boolean shouldBeLowered = isInputActive || timeSinceInput < 90;
 
-            float targetOffset = shouldBeLowered ? -0.075f : 0.0f;
+            float targetOffset = shouldBeLowered ? -0.08f : 0.0f;
             // Lower lerp factor for smoother/slower transition
-            float lerpFactor = 0.05f;
+            float lerpFactor = 0.03f;
 
             this.customBobOffset = Mth.lerp(lerpFactor, this.customBobOffset, targetOffset);
 
