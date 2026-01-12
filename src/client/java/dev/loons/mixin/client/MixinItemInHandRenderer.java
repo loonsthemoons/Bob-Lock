@@ -39,11 +39,16 @@ public abstract class MixinItemInHandRenderer {
 
         // Custom Bobbing Application
         if (bobEnabled) {
-            double velocitySqr = player.getDeltaMovement().horizontalDistanceSqr();
-            boolean isMoving = velocitySqr > 0.0001;
+            // Check input keys instead of velocity for immediate response
+            boolean isMoving = this.minecraft.options.keyUp.isDown() ||
+                    this.minecraft.options.keyDown.isDown() ||
+                    this.minecraft.options.keyLeft.isDown() ||
+                    this.minecraft.options.keyRight.isDown();
 
-            float targetOffset = isMoving ? -0.1f : 0.0f;
-            float lerpFactor = 0.1f;
+            // Reduced target offset to -0.05f (was -0.1f)
+            float targetOffset = isMoving ? -0.05f : 0.0f;
+            // Lower lerp factor for smoother/slower transition (was 0.1f)
+            float lerpFactor = 0.05f;
 
             this.customBobOffset = Mth.lerp(lerpFactor, this.customBobOffset, targetOffset);
 
