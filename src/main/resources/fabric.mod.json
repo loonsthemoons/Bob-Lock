@@ -3,7 +3,7 @@
 	"id": "bob-lock",
 	"version": "${version}",
 	"name": "Bob Lock",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Happy little bobs! Make the vanilla view bobbing just a little more happy! :D",
 	"authors": [
 		"Me!"
 	],
@@ -31,8 +31,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.18.4",
-		"minecraft": "~1.21.8",
-		"java": ">=21",
+		"minecraft": "${minecraft_dependency}",
+		"java": ">=${java_version}",
 		"fabric-api": "*"
 	}
 }
