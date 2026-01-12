@@ -23,5 +23,9 @@ It replaces the vanilla bobbing animation with a modern, smooth hand-lowering ef
 
 ## Dependencies
 
-- Minecraft **1.20.1, 1.21.8, 1.21.11**
+- Minecraft **1.21.8**
 - Fabric Loader
+- Fabric API
+
+## Early Development Note
+This mod is very early in development and unstable, if you plan on building it yourself, note that any other version that 1.21.8 does not work and leads to crashes
