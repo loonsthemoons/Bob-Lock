@@ -31,10 +31,14 @@ public abstract class MixinItemInHandRenderer {
     private void onRenderItemHead(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand,
             float swingProgress, ItemStack stack, float equipProgress, PoseStack poseStack, MultiBufferSource buffer,
             int combinedLight, CallbackInfo ci) {
+        // Check the option BEFORE setting the flag, so we get the real value (not our
+        // forced-false value)
+        boolean bobEnabled = this.minecraft.options.bobView().get();
+
         BobLockClient.isRenderingHand = true;
 
         // Custom Bobbing Application
-        if (this.minecraft.options.bobView().get()) {
+        if (bobEnabled) {
             double velocitySqr = player.getDeltaMovement().horizontalDistanceSqr();
             boolean isMoving = velocitySqr > 0.0001;
 
