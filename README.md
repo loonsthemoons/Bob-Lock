@@ -17,7 +17,7 @@ It replaces the vanilla bobbing animation with a modern, smooth hand-lowering ef
   Includes smooth transitions and a subtle input-based delay for a natural, premium feel.
 
 - **Vanilla Friendly**  
-  Works entirely client-side. To disable, simply turn "View Bobbing" to **OFF** in video settings.
+  Works entirely client-side. To disable, simply turn "View Bobbing" to off in video settings.
 
 ---
 
