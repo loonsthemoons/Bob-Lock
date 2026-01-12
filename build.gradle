@@ -62,15 +62,23 @@ subprojects {
 	}
 
 	if (project.hasProperty('java_version')) {
-		processResources {
+		tasks.withType(ProcessResources).configureEach {
 			inputs.property "version", project.version
 			inputs.property "minecraft_version", project.minecraft_version
 			inputs.property "java_version", project.java_version
+
+			// Set Mixin compatibility level based on Java version
+			def compatibilityLevel = "JAVA_${project.java_version}"
+			inputs.property "java_compat", compatibilityLevel
 
 			filesMatching("fabric.mod.json") {
 				expand "version": project.version,
 					   "minecraft_dependency": "~${project.minecraft_version}",
 					   "java_version": project.java_version
+			}
+
+			filesMatching("*.mixins.json") {
+				expand "java_compat": compatibilityLevel
 			}
 		}
 	}

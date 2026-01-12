@@ -1,7 +1,7 @@
 {
 	"required": true,
 	"package": "dev.loons.mixin",
-	"compatibilityLevel": "JAVA_21",
+	"compatibilityLevel": "${java_compat}",
 	"mixins": [
 		"ExampleMixin"
 	],

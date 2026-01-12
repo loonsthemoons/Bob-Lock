@@ -3,18 +3,15 @@ package dev.loons.mixin.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.loons.BobLockClient;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemInHandRenderer.class)
@@ -31,15 +28,14 @@ public abstract class MixinItemInHandRenderer {
     private long lastInputTime = 0;
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"))
-    private void onRenderItemHead(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand,
-            float swingProgress, ItemStack stack, float equipProgress, PoseStack poseStack, MultiBufferSource buffer,
-            int combinedLight, CallbackInfo ci) {
-        boolean bobEnabled = this.minecraft.options.bobView().get();
-
+    private void onRenderItemHead(CallbackInfo ci) {
+        BobLockClient.wasBobbingEnabled = this.minecraft.options.bobView().get();
         BobLockClient.isRenderingHand = true;
+    }
 
-        // Custom Bobbing Application
-        if (bobEnabled) {
+    @ModifyVariable(method = "renderArmWithItem", at = @At("HEAD"), argsOnly = true)
+    private PoseStack applyCustomBobbing(PoseStack poseStack) {
+        if (BobLockClient.wasBobbingEnabled) {
             // Check input keys instead of velocity for immediate response
             boolean isInputActive = this.minecraft.options.keyUp.isDown() ||
                     this.minecraft.options.keyDown.isDown() ||
@@ -63,12 +59,11 @@ public abstract class MixinItemInHandRenderer {
             // Apply translation to the PoseStack
             poseStack.translate(0.0, this.customBobOffset, 0.0);
         }
+        return poseStack;
     }
 
     @Inject(method = "renderArmWithItem", at = @At("RETURN"))
-    private void onRenderItemReturn(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand,
-            float swingProgress, ItemStack stack, float equipProgress, PoseStack poseStack, MultiBufferSource buffer,
-            int combinedLight, CallbackInfo ci) {
+    private void onRenderItemReturn(CallbackInfo ci) {
         BobLockClient.isRenderingHand = false;
     }
 }
