@@ -27,12 +27,13 @@ public abstract class MixinItemInHandRenderer {
     @Unique
     private float customBobOffset = 0.0f;
 
-    @Inject(method = "renderItem", at = @At("HEAD"))
+    @Inject(method = "renderArmWithItem", at = @At("HEAD"))
     private void onRenderItemHead(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand,
             float swingProgress, ItemStack stack, float equipProgress, PoseStack poseStack, MultiBufferSource buffer,
             int combinedLight, CallbackInfo ci) {
         BobLockClient.isRenderingHand = true;
 
+        // Custom Bobbing Application
         if (this.minecraft.options.bobView().get()) {
             double velocitySqr = player.getDeltaMovement().horizontalDistanceSqr();
             boolean isMoving = velocitySqr > 0.0001;
@@ -41,11 +42,13 @@ public abstract class MixinItemInHandRenderer {
             float lerpFactor = 0.1f;
 
             this.customBobOffset = Mth.lerp(lerpFactor, this.customBobOffset, targetOffset);
+
+            // Apply translation to the PoseStack
             poseStack.translate(0.0, this.customBobOffset, 0.0);
         }
     }
 
-    @Inject(method = "renderItem", at = @At("RETURN"))
+    @Inject(method = "renderArmWithItem", at = @At("RETURN"))
     private void onRenderItemReturn(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand,
             float swingProgress, ItemStack stack, float equipProgress, PoseStack poseStack, MultiBufferSource buffer,
             int combinedLight, CallbackInfo ci) {

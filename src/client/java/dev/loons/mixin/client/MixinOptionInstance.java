@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(OptionInstance.class)
 public class MixinOptionInstance<T> {
 
+    @SuppressWarnings("unchecked")
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
     private void onGet(CallbackInfoReturnable<T> cir) {
         if (BobLockClient.isRenderingHand) {
