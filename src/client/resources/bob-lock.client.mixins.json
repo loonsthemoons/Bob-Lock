@@ -4,8 +4,7 @@
 	"compatibilityLevel": "${java_compat}",
 	"mixins": [
 		"MixinGameRenderer",
-		"MixinItemInHandRenderer",
-		"MixinOptionInstance"
+		"MixinItemInHandRenderer"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -4,94 +4,116 @@ plugins {
 }
 
 subprojects {
-	apply plugin: 'net.fabricmc.fabric-loom-remap'
-	apply plugin: 'maven-publish'
-	apply plugin: 'java'
+	// Only configure actual version subprojects
+	if (project.path.startsWith(":versions:") && project.name != "versions") {
+		apply plugin: 'net.fabricmc.fabric-loom-remap'
+		apply plugin: 'maven-publish'
+		apply plugin: 'java'
 
-	version = rootProject.mod_version
-	group = rootProject.maven_group
+		version = rootProject.mod_version
+		group = rootProject.maven_group
 
-	base {
-		archivesName = "${rootProject.archives_base_name}-${project.minecraft_version}"
-	}
-
-	repositories {
-		maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
+		base {
+			archivesName = "${rootProject.archives_base_name}-${project.minecraft_version}"
 		}
-		mavenCentral()
-	}
 
-	dependencies {
-		minecraft "com.mojang:minecraft:${project.minecraft_version}"
-		mappings loom.officialMojangMappings()
-		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-	}
-
-	loom {
-		splitEnvironmentSourceSets()
-
-		mods {
-			"bob-lock" {
-				sourceSet sourceSets.main
-				sourceSet sourceSets.client
+		repositories {
+			mavenCentral()
+			maven {
+				name = "Shedaniel"
+				url = "https://maven.shedaniel.me/"
+			}
+			maven {
+				name = "Terraformers"
+				url = "https://maven.terraformersmc.com/"
 			}
 		}
-	}
 
-	// Shared Sources Configuration
-	sourceSets {
-		main {
+		loom {
+			splitEnvironmentSourceSets()
+
+			mods {
+				"bob-lock" {
+					sourceSet sourceSets.main
+					sourceSet sourceSets.client
+				}
+			}
+		}
+
+		dependencies {
+			minecraft "com.mojang:minecraft:${project.minecraft_version}"
+			mappings loom.officialMojangMappings()
+			modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+			modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+			// Mod-specific dependencies
+			def clothVer = project.findProperty('cloth_config_version')
+			if (clothVer) {
+				modApi "me.shedaniel.cloth:cloth-config-fabric:${clothVer}"
+			}
+			def modMenuVer = project.findProperty('modmenu_version')
+			if (modMenuVer) {
+				modImplementation "com.terraformersmc:modmenu:${modMenuVer}"
+			}
+		}
+
+		configurations {
+			clientImplementation.extendsFrom implementation
+			clientApi.extendsFrom api
+		}
+
+		// Shared Sources Configuration
+		sourceSets {
+			main {
+				java {
+					srcDirs = [rootProject.file("src/main/java")]
+				}
+				resources {
+					srcDirs = [rootProject.file("src/main/resources")]
+				}
+			}
+			client {
+				java {
+					srcDirs = [rootProject.file("src/client/java")]
+				}
+				resources {
+					srcDirs = [rootProject.file("src/client/resources")]
+				}
+			}
+		}
+
+		if (project.hasProperty('java_version')) {
+			tasks.withType(ProcessResources).configureEach {
+				inputs.property "version", project.version
+				inputs.property "minecraft_version", project.minecraft_version
+				inputs.property "java_version", project.java_version
+
+				// Set Mixin compatibility level based on Java version
+				def compatibilityLevel = "JAVA_${project.java_version}"
+				inputs.property "java_compat", compatibilityLevel
+
+				filesMatching("fabric.mod.json") {
+					expand "version": project.version,
+						   "minecraft_dependency": "~${project.minecraft_version}",
+						   "java_version": project.java_version
+				}
+
+				filesMatching("*.mixins.json") {
+					expand "java_compat": compatibilityLevel
+				}
+			}
+		}
+
+		if (project.hasProperty('java_version')) {
+			tasks.withType(JavaCompile).configureEach {
+				it.options.release = project.java_version.toInteger()
+			}
+
 			java {
-				srcDirs = [rootProject.file("src/main/java")]
+				withSourcesJar()
+				sourceCompatibility = JavaVersion.toVersion(project.java_version)
+				targetCompatibility = JavaVersion.toVersion(project.java_version)
 			}
-			resources {
-				srcDirs = [rootProject.file("src/main/resources")]
-			}
-		}
-		client {
-			java {
-				srcDirs = [rootProject.file("src/client/java")]
-			}
-			resources {
-				srcDirs = [rootProject.file("src/client/resources")]
-			}
-		}
-	}
-
-	if (project.hasProperty('java_version')) {
-		tasks.withType(ProcessResources).configureEach {
-			inputs.property "version", project.version
-			inputs.property "minecraft_version", project.minecraft_version
-			inputs.property "java_version", project.java_version
-
-			// Set Mixin compatibility level based on Java version
-			def compatibilityLevel = "JAVA_${project.java_version}"
-			inputs.property "java_compat", compatibilityLevel
-
-			filesMatching("fabric.mod.json") {
-				expand "version": project.version,
-					   "minecraft_dependency": "~${project.minecraft_version}",
-					   "java_version": project.java_version
-			}
-
-			filesMatching("*.mixins.json") {
-				expand "java_compat": compatibilityLevel
-			}
-		}
-	}
-
-	if (project.hasProperty('java_version')) {
-		tasks.withType(JavaCompile).configureEach {
-			it.options.release = project.java_version.toInteger()
-		}
-
-		java {
-			withSourcesJar()
-			sourceCompatibility = JavaVersion.toVersion(project.java_version)
-			targetCompatibility = JavaVersion.toVersion(project.java_version)
 		}
 	}
 }

@@ -3,11 +3,10 @@ package dev.loons;
 import net.fabricmc.api.ClientModInitializer;
 
 public class BobLockClient implements ClientModInitializer {
-	public static boolean isRenderingHand = false;
-	public static boolean wasBobbingEnabled = false;
 
 	@Override
 	public void onInitializeClient() {
+		BobLockConfig.getInstance().load();
 		org.slf4j.LoggerFactory.getLogger("bob-lock").info("Hello from BobLockClient!");
 	}
 }
