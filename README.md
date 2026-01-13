@@ -23,7 +23,7 @@ It replaces the vanilla bobbing animation with a modern, smooth hand-lowering ef
 
 ## Dependencies
 
-- Minecraft **1.20.1**, **1.21.8**, **1.21.11**
+- Minecraft **1.20.1**, **1.21.4**, **1.21.8**, **1.21.11**
 - Fabric Loader
 - Fabric API
 - Cloth Config API
