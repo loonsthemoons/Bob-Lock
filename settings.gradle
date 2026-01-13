@@ -12,5 +12,6 @@ pluginManagement {
 rootProject.name = 'bob-lock'
 
 include 'versions:1.20.1'
+include 'versions:1.21.4'
 include 'versions:1.21.8'
 include 'versions:1.21.11'
